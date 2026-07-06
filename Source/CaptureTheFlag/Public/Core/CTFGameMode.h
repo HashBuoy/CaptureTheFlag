@@ -3,11 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AI/CTFAITeamController.h"
-#include "AI/CTFPlayerTeamController.h"
 #include "GameFramework/GameMode.h"
 #include "CTFGameMode.generated.h"
 
+class ACTFAgentCharacter;
+class ACTFPlayerTeamController;
+class ACTFAITeamController;
 class APlayerStart;
 class UCTFGameData;
 /**
@@ -18,14 +19,22 @@ class CAPTURETHEFLAG_API ACTFGameMode : public AGameMode
 {
 	GENERATED_BODY()
 
+public:
+	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
+	
 private:
 	void CachePlayerStart();
 	
-	void SpawnTeams();
+	void SpawnTeamControllers();
+	
+	void SpawnTeamAgents(int32 TeamId, int32 Count);
 
+	FTransform GetPlayerStartTransformForTeam(int32 TeamId);
+	
 	APlayerStart* GetPlayerStartForTeam(int32 TeamId);
 	
 protected:
+	virtual void OnPostLogin(AController* NewPlayer) override;
 	
 	virtual void HandleMatchHasStarted() override;
 
@@ -38,6 +47,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category=SpawnClassRefs)
 	TSubclassOf<ACTFPlayerTeamController> PlayerTeamControllerClass;
+
+	UPROPERTY(EditDefaultsOnly, Category=SpawnClassRefs)
+	TSubclassOf<ACTFAgentCharacter> AgentCharacterClass;
 	
 	UPROPERTY(Transient)
 	TArray<APlayerStart*> PlayerStarts;

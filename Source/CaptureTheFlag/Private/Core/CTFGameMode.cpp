@@ -3,32 +3,37 @@
 
 #include "Core/CTFGameMode.h"
 
+#include "AI/CTFAgentCharacter.h"
+#include "AI/CTFAITeamController.h"
+#include "AI/CTFPlayerTeamController.h"
 #include "Data/CTFGameData.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 
+void ACTFGameMode::OnPostLogin(AController* NewPlayer)
+{
+	
+}
 
 void ACTFGameMode::HandleMatchHasStarted()
 {
 	Super::HandleMatchHasStarted();
+	
+	SpawnTeamControllers();
+}
+
+AActor* ACTFGameMode::ChoosePlayerStart_Implementation(AController* Player)
+{
 	CachePlayerStart();
-	SpawnTeams();
+	return GetPlayerStartForTeam(0);
 }
 
-void ACTFGameMode::CachePlayerStart()
-{
-	TArray<AActor*> PlayerStartActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(),APlayerStart::StaticClass(),PlayerStartActors);
 
-	for(AActor* PlayerStart : PlayerStartActors)
-	{
-		PlayerStarts.Add(Cast<APlayerStart>(PlayerStart));
-	}
-}
-
-void ACTFGameMode::SpawnTeams()
+void ACTFGameMode::SpawnTeamControllers()
 {
+	CachePlayerStart();
+	
 	for(int32 i = 0 ; i < GameData->NumOfTeams; i++)
 	{
 		const APlayerStart* PlayerStart = PlayerStart = GetPlayerStartForTeam(i);
@@ -50,24 +55,60 @@ void ACTFGameMode::SpawnTeams()
 				UE_LOG(LogTemp, Warning, TEXT("PlayerTeamController is NULL"));
 				continue;
 			}
+
+			SpawnTeamAgents(0, GameData->NumOfAgentsPerTeam-1);
 		}
 		else
 		{
-			//Spawn AI Team Controller
 			FActorSpawnParameters SpawnInfo;
 			SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 			
-			//Spawn Player Team Controller
+			//Spawn AI Team Controller
 			ACTFAITeamController* AITeamController = GetWorld()->SpawnActor<ACTFAITeamController>(AITeamControllerClass, PlayerStart->GetActorTransform(), SpawnInfo);
 			if (!IsValid(AITeamController))
 			{
 				UE_LOG(LogTemp, Warning, TEXT("ACTFAITeamController is NULL"));
 				continue;
 			}
+
+			SpawnTeamAgents(i, GameData->NumOfAgentsPerTeam);
 		}
-		
-		
 	}
+}
+
+void ACTFGameMode::SpawnTeamAgents(int32 TeamId, int32 Count)
+{
+	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+	
+	for(int32 i = 0 ; i < Count; i++)
+	{
+		ACTFAgentCharacter* AgentCharacter = GetWorld()->SpawnActor<ACTFAgentCharacter>(AgentCharacterClass, GetPlayerStartTransformForTeam(TeamId), SpawnInfo);
+	}
+}
+
+void ACTFGameMode::CachePlayerStart()
+{
+	if (!PlayerStarts.IsEmpty())
+	{
+		return;
+	}
+	
+	TArray<AActor*> PlayerStartActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(),APlayerStart::StaticClass(),PlayerStartActors);
+
+	for(AActor* PlayerStart : PlayerStartActors)
+	{
+		PlayerStarts.Add(Cast<APlayerStart>(PlayerStart));
+	}
+}
+
+FTransform ACTFGameMode::GetPlayerStartTransformForTeam(int32 TeamId)
+{
+	const APlayerStart* PlayerStart = PlayerStart = GetPlayerStartForTeam(TeamId);
+	const FVector2D Offset2D = FMath::RandPointInCircle(250.f);
+	const FVector Location = PlayerStart->GetActorLocation() + FVector(Offset2D,0);
+	return FTransform( PlayerStart->GetActorRotation() , Location,  FVector::OneVector);
 }
 
 APlayerStart* ACTFGameMode::GetPlayerStartForTeam(int32 TeamId)
