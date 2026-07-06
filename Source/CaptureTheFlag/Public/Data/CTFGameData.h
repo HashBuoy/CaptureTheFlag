@@ -13,5 +13,11 @@ UCLASS()
 class CAPTURETHEFLAG_API UCTFGameData : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
-	
+
+	UPROPERTY(EditDefaultsOnly)
+	int32 NumOfAgentsPerTeam = 2;
+
+	UPROPERTY(EditDefaultsOnly)
+	int32 NumOfRounds = 3;
+
 };
