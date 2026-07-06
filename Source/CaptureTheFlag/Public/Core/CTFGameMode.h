@@ -21,6 +21,8 @@ class CAPTURETHEFLAG_API ACTFGameMode : public AGameMode
 
 public:
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
+
+	void EnteredKillZone(ACharacter* Character);
 	
 private:
 	void CachePlayerStart();

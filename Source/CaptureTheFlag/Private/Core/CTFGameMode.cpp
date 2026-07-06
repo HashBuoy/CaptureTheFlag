@@ -10,6 +10,7 @@
 #include "Engine/World.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/CaptureTheFlagCharacter.h"
 
 void ACTFGameMode::OnPostLogin(AController* NewPlayer)
 {
@@ -28,6 +29,7 @@ AActor* ACTFGameMode::ChoosePlayerStart_Implementation(AController* Player)
 	CachePlayerStart();
 	return GetPlayerStartForTeam(0);
 }
+
 
 
 void ACTFGameMode::SpawnTeamControllers()
@@ -118,9 +120,24 @@ APlayerStart* ACTFGameMode::GetPlayerStartForTeam(int32 TeamId)
 	APlayerStart* const* Found = PlayerStarts.FindByPredicate(
 		[&TeamTag](const APlayerStart* PlayerStart)
 		{
-			return PlayerStart &&
-				   PlayerStart->PlayerStartTag == TeamTag;
+			return PlayerStart && PlayerStart->PlayerStartTag == TeamTag;
 		});
 	
 	return Found ? *Found : nullptr;
+}
+
+void ACTFGameMode::EnteredKillZone(ACharacter* Character)
+{
+	if(!IsValid(Character))
+	{
+		return;;
+	}
+
+	if(Character->IsA(ACaptureTheFlagCharacter::StaticClass()))
+	{
+		AController* Controller = Character->GetController();
+		Character->Destroy();
+		RestartPlayer(Controller);
+	}
+	
 }
