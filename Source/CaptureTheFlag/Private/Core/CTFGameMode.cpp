@@ -13,10 +13,15 @@
 #include "Kismet/GameplayStatics.h"
 #include "Player/CaptureTheFlagCharacter.h"
 #include "Player/CaptureTheFlagPlayerController.h"
-#include "Player/CTFPlayerState.h"
+
 
 void ACTFGameMode::OnPostLogin(AController* NewPlayer)
 {
+	ACaptureTheFlagPlayerController* PC = Cast<ACaptureTheFlagPlayerController>(NewPlayer);
+	if (PC)
+	{
+		PC->SetTeamId(0);
+	}
 	
 }
 
@@ -60,6 +65,7 @@ void ACTFGameMode::SpawnTeamControllers()
 				UE_LOG(LogTemp, Warning, TEXT("PlayerTeamController is NULL"));
 				continue;
 			}
+			PlayerTeamController->SetTeamId(0);
 			
 			SpawnTeamAgentControllers(0, GameData->NumOfAgentsPerTeam-1);
 		}
@@ -75,7 +81,8 @@ void ACTFGameMode::SpawnTeamControllers()
 				UE_LOG(LogTemp, Warning, TEXT("ACTFAITeamController is NULL"));
 				continue;
 			}
-
+			AITeamController->SetTeamId(i);
+			
 			SpawnTeamAgentControllers(i, GameData->NumOfAgentsPerTeam);
 		}
 	}
@@ -89,7 +96,7 @@ void ACTFGameMode::SpawnTeamAgentControllers(uint8 TeamId, uint8 Count)
 	for(int32 i = 0 ; i < Count; i++)
 	{
 		ACTFAgentController* AgentController = GetWorld()->SpawnActor<ACTFAgentController>(AgentControllerClass, GetPlayerStartTransformForTeam(TeamId), SpawnInfo);
-		AgentController->GetPlayerState<ACTFPlayerState>()->SetTeamId(TeamId);
+		AgentController->SetTeamId(TeamId);
 		AgentController->Possess(SpawnTeamAgent(TeamId));
 	}
 }
@@ -139,7 +146,7 @@ APlayerStart* ACTFGameMode::GetPlayerStartForTeam(uint8 TeamId)
 	return Found ? *Found : nullptr;
 }
 
-void ACTFGameMode::EnteredKillZone(ACharacter* Character)
+void ACTFGameMode::ResetCharacter(ACharacter* Character)
 {
 	if(!IsValid(Character))
 	{
@@ -156,6 +163,6 @@ void ACTFGameMode::EnteredKillZone(ACharacter* Character)
 	{
 		ACTFAgentController* Controller = Character->GetController<ACTFAgentController>();
 		Character->Destroy();
-		Controller->Possess(SpawnTeamAgent(Controller->GetPlayerState<ACTFPlayerState>()->GetTeamId()));
+		Controller->Possess(SpawnTeamAgent(Controller->GetTeamId()));
 	}
 }

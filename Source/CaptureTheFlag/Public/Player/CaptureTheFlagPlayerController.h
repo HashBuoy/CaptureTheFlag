@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "Interface/CTFTeamInterface.h"
 #include "CaptureTheFlagPlayerController.generated.h"
 
 class UInputMappingContext;
@@ -14,9 +15,15 @@ class UUserWidget;
  *  Manages input mappings
  */
 UCLASS(abstract)
-class ACaptureTheFlagPlayerController : public APlayerController
+class ACaptureTheFlagPlayerController : public APlayerController, public ICTFTeamInterface
 {
 	GENERATED_BODY()
+public:
+	//~ Team Interface
+	virtual uint8 GetTeamId_Implementation() const override;
+
+	virtual void SetTeamId(uint8 InTeamId) override;
+	//~~~~~~
 	
 protected:
 

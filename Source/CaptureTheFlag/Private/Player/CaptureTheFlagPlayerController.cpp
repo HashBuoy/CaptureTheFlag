@@ -7,7 +7,18 @@
 #include "InputMappingContext.h"
 #include "Blueprint/UserWidget.h"
 #include "CaptureTheFlag.h"
+#include "Player/CTFPlayerState.h"
 #include "Widgets/Input/SVirtualJoystick.h"
+
+uint8 ACaptureTheFlagPlayerController::GetTeamId_Implementation() const
+{
+	return GetPlayerState<ACTFPlayerState>()->GetTeamId();
+}
+
+void ACaptureTheFlagPlayerController::SetTeamId(uint8 InTeamId)
+{
+	GetPlayerState<ACTFPlayerState>()->SetTeamId(InTeamId);
+}
 
 void ACaptureTheFlagPlayerController::BeginPlay()
 {

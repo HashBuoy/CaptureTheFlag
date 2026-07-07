@@ -3,23 +3,23 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/PlayerState.h"
-#include "CTFPlayerState.generated.h"
+#include "AIController.h"
+#include "Interface/CTFTeamInterface.h"
+#include "CTFTeamControllerBase.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class CAPTURETHEFLAG_API ACTFPlayerState : public APlayerState
+class CAPTURETHEFLAG_API ACTFTeamControllerBase : public AAIController
 {
 	GENERATED_BODY()
-
+	
 public:
-	uint8 GetTeamId();
+	uint8 GetTeamId() const;
+
 	void SetTeamId(uint8 InTeamId);
 
 private:
-	UPROPERTY(VisibleAnywhere)
 	uint8 TeamId;
-	
 };

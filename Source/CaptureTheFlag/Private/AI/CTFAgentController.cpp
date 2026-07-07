@@ -3,6 +3,18 @@
 
 #include "AI/CTFAgentController.h"
 
+#include "Player/CTFPlayerState.h"
+
+uint8 ACTFAgentController::GetTeamId_Implementation() const
+{
+	return GetPlayerState<ACTFPlayerState>()->GetTeamId();
+}
+
+void ACTFAgentController::SetTeamId(uint8 InTeamId)
+{
+	GetPlayerState<ACTFPlayerState>()->SetTeamId(InTeamId);
+}
+
 void ACTFAgentController::BeginPlay()
 {
 	UE_LOG(LogTemp,Error,TEXT("ACTFAgentController %s BeginPlay"),*this->GetActorNameOrLabel());

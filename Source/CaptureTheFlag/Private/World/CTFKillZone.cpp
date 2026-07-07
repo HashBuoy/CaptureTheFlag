@@ -47,6 +47,6 @@ void ACTFKillZone::OnBoxBeginOverlap(
 	ACharacter* Character = Cast<ACharacter>(OtherActor);
 	if(ACTFGameMode* GameMode = UCTFBlueprintFunctionLibrary::GetCTFGameMode(this))
 	{
-		GameMode->EnteredKillZone(Character);
+		GameMode->ResetCharacter(Character);
 	}
 }

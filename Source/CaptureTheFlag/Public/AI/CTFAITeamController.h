@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AIController.h"
+#include "CTFTeamControllerBase.h"
 #include "CTFAITeamController.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class CAPTURETHEFLAG_API ACTFAITeamController : public AAIController
+class CAPTURETHEFLAG_API ACTFAITeamController : public ACTFTeamControllerBase
 {
 	GENERATED_BODY()
 	

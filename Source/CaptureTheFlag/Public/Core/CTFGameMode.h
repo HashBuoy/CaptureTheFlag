@@ -24,7 +24,7 @@ public:
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 	
 	UFUNCTION(BlueprintCallable)
-	void EnteredKillZone(ACharacter* Character);
+	void ResetCharacter(ACharacter* Character);
 	
 private:
 	void CachePlayerStart();
