@@ -18,4 +18,7 @@ class CAPTURETHEFLAG_API UCTFBlueprintFunctionLibrary : public UBlueprintFunctio
 public:
 	UFUNCTION(BlueprintPure, Category="CTF", meta=(WorldContext="WorldContextObject"))
 	static ACTFGameMode* GetCTFGameMode(const UObject* WorldContextObject);
+
+	UFUNCTION(BlueprintPure, Category="CTF")
+    static FLinearColor GetTeamColor(uint8 TeamId);
 };

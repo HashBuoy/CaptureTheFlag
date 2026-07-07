@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Interface/CTFTeamInterface.h"
 #include "Logging/LogMacros.h"
 #include "CaptureTheFlagCharacter.generated.h"
 
@@ -19,7 +20,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
  *  Implements a controllable orbiting camera
  */
 UCLASS(abstract)
-class ACaptureTheFlagCharacter : public ACharacter
+class ACaptureTheFlagCharacter : public ACharacter, public ICTFTeamInterface
 {
 	GENERATED_BODY()
 
@@ -54,11 +55,22 @@ public:
 	/** Constructor */
 	ACaptureTheFlagCharacter();	
 
+	//~ Team Interface
+	virtual uint8 GetTeamId_Implementation() const override;
+
+	virtual void SetTeamId(uint8 InTeamId) override;
+	//~~~~~~
+	
+	virtual void PossessedBy(AController* NewController) override;
+	
 protected:
 
 	/** Initialize input action bindings */
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UFUNCTION(BlueprintNativeEvent)
+	void UpdateVisuals();
+	
 protected:
 
 	/** Called for movement input */

@@ -50,6 +50,30 @@ ACaptureTheFlagCharacter::ACaptureTheFlagCharacter()
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
 
+uint8 ACaptureTheFlagCharacter::GetTeamId_Implementation() const
+{
+	if (const ICTFTeamInterface* TeamInterface = Cast<ICTFTeamInterface>(Controller))
+	{
+		return TeamInterface->GetTeamId();
+	}
+	
+	return 255;
+}
+
+void ACaptureTheFlagCharacter::SetTeamId(uint8 InTeamId)
+{
+	if (ICTFTeamInterface* TeamInterface = Cast<ICTFTeamInterface>(Controller))
+	{
+		TeamInterface->SetTeamId(InTeamId);
+	}
+}
+
+void ACaptureTheFlagCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+	UpdateVisuals();
+}
+
 void ACaptureTheFlagCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	// Set up action bindings
@@ -70,6 +94,10 @@ void ACaptureTheFlagCharacter::SetupPlayerInputComponent(UInputComponent* Player
 	{
 		UE_LOG(LogCaptureTheFlag, Error, TEXT("'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
 	}
+}
+
+void ACaptureTheFlagCharacter::UpdateVisuals_Implementation()
+{
 }
 
 void ACaptureTheFlagCharacter::Move(const FInputActionValue& Value)

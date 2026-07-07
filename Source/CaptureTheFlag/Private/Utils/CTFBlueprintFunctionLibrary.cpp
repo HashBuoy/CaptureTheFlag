@@ -15,3 +15,18 @@ ACTFGameMode* UCTFBlueprintFunctionLibrary::GetCTFGameMode(const UObject* WorldC
 
 	return Cast<ACTFGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
 }
+
+FLinearColor UCTFBlueprintFunctionLibrary::GetTeamColor(uint8 TeamId)
+{
+	switch (TeamId)
+	{
+	case 0:
+		return FLinearColor::Green;
+
+	case 1:
+		return FLinearColor::Red;
+
+	default:
+		return FLinearColor::White;
+	}
+}
