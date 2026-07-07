@@ -4,6 +4,7 @@
 #include "Core/CTFGameMode.h"
 
 #include "AI/CTFAgentCharacter.h"
+#include "AI/CTFAgentController.h"
 #include "AI/CTFAITeamController.h"
 #include "AI/CTFPlayerTeamController.h"
 #include "Data/CTFGameData.h"
@@ -11,6 +12,8 @@
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/CaptureTheFlagCharacter.h"
+#include "Player/CaptureTheFlagPlayerController.h"
+#include "Player/CTFPlayerState.h"
 
 void ACTFGameMode::OnPostLogin(AController* NewPlayer)
 {
@@ -57,8 +60,8 @@ void ACTFGameMode::SpawnTeamControllers()
 				UE_LOG(LogTemp, Warning, TEXT("PlayerTeamController is NULL"));
 				continue;
 			}
-
-			SpawnTeamAgents(0, GameData->NumOfAgentsPerTeam-1);
+			
+			SpawnTeamAgentControllers(0, GameData->NumOfAgentsPerTeam-1);
 		}
 		else
 		{
@@ -73,20 +76,30 @@ void ACTFGameMode::SpawnTeamControllers()
 				continue;
 			}
 
-			SpawnTeamAgents(i, GameData->NumOfAgentsPerTeam);
+			SpawnTeamAgentControllers(i, GameData->NumOfAgentsPerTeam);
 		}
 	}
 }
 
-void ACTFGameMode::SpawnTeamAgents(int32 TeamId, int32 Count)
+void ACTFGameMode::SpawnTeamAgentControllers(uint8 TeamId, uint8 Count)
 {
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 	
 	for(int32 i = 0 ; i < Count; i++)
 	{
-		ACTFAgentCharacter* AgentCharacter = GetWorld()->SpawnActor<ACTFAgentCharacter>(AgentCharacterClass, GetPlayerStartTransformForTeam(TeamId), SpawnInfo);
+		ACTFAgentController* AgentController = GetWorld()->SpawnActor<ACTFAgentController>(AgentControllerClass, GetPlayerStartTransformForTeam(TeamId), SpawnInfo);
+		AgentController->GetPlayerState<ACTFPlayerState>()->SetTeamId(TeamId);
+		AgentController->Possess(SpawnTeamAgent(TeamId));
 	}
+}
+
+ACTFAgentCharacter* ACTFGameMode::SpawnTeamAgent(uint8 TeamId)
+{
+	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+	ACTFAgentCharacter* AgentCharacter = GetWorld()->SpawnActor<ACTFAgentCharacter>(AgentCharacterClass, GetPlayerStartTransformForTeam(TeamId), SpawnInfo);
+	return AgentCharacter; 
 }
 
 void ACTFGameMode::CachePlayerStart()
@@ -105,7 +118,7 @@ void ACTFGameMode::CachePlayerStart()
 	}
 }
 
-FTransform ACTFGameMode::GetPlayerStartTransformForTeam(int32 TeamId)
+FTransform ACTFGameMode::GetPlayerStartTransformForTeam(uint8 TeamId)
 {
 	const APlayerStart* PlayerStart = PlayerStart = GetPlayerStartForTeam(TeamId);
 	const FVector2D Offset2D = FMath::RandPointInCircle(250.f);
@@ -113,7 +126,7 @@ FTransform ACTFGameMode::GetPlayerStartTransformForTeam(int32 TeamId)
 	return FTransform( PlayerStart->GetActorRotation() , Location,  FVector::OneVector);
 }
 
-APlayerStart* ACTFGameMode::GetPlayerStartForTeam(int32 TeamId)
+APlayerStart* ACTFGameMode::GetPlayerStartForTeam(uint8 TeamId)
 {
 	const FName TeamTag(*FString::FromInt(TeamId));
 
@@ -133,11 +146,16 @@ void ACTFGameMode::EnteredKillZone(ACharacter* Character)
 		return;;
 	}
 
-	if(Character->IsA(ACaptureTheFlagCharacter::StaticClass()))
+	if(Character->GetController()->IsA(ACaptureTheFlagPlayerController::StaticClass()))
 	{
 		AController* Controller = Character->GetController();
 		Character->Destroy();
 		RestartPlayer(Controller);
 	}
-	
+	else if(Character->GetController()->IsA(ACTFAgentController::StaticClass()))
+	{
+		ACTFAgentController* Controller = Character->GetController<ACTFAgentController>();
+		Character->Destroy();
+		Controller->Possess(SpawnTeamAgent(Controller->GetPlayerState<ACTFPlayerState>()->GetTeamId()));
+	}
 }

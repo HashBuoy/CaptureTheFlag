@@ -6,6 +6,7 @@
 #include "GameFramework/GameMode.h"
 #include "CTFGameMode.generated.h"
 
+class ACTFAgentController;
 class ACTFAgentCharacter;
 class ACTFPlayerTeamController;
 class ACTFAITeamController;
@@ -21,7 +22,8 @@ class CAPTURETHEFLAG_API ACTFGameMode : public AGameMode
 
 public:
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
-
+	
+	UFUNCTION(BlueprintCallable)
 	void EnteredKillZone(ACharacter* Character);
 	
 private:
@@ -29,11 +31,13 @@ private:
 	
 	void SpawnTeamControllers();
 	
-	void SpawnTeamAgents(int32 TeamId, int32 Count);
-
-	FTransform GetPlayerStartTransformForTeam(int32 TeamId);
+	void SpawnTeamAgentControllers(uint8 TeamId, uint8 Count);
 	
-	APlayerStart* GetPlayerStartForTeam(int32 TeamId);
+	ACTFAgentCharacter* SpawnTeamAgent(uint8 TeamId);
+
+	FTransform GetPlayerStartTransformForTeam(uint8 TeamId);
+	
+	APlayerStart* GetPlayerStartForTeam(uint8 TeamId);
 	
 protected:
 	virtual void OnPostLogin(AController* NewPlayer) override;
@@ -47,6 +51,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category=SpawnClassRefs)
 	TSubclassOf<ACTFAITeamController> AITeamControllerClass;
 
+	UPROPERTY(EditDefaultsOnly, Category=SpawnClassRefs)
+	TSubclassOf<ACTFAgentController> AgentControllerClass;
+	
 	UPROPERTY(EditDefaultsOnly, Category=SpawnClassRefs)
 	TSubclassOf<ACTFPlayerTeamController> PlayerTeamControllerClass;
 

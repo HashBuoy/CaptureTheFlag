@@ -13,5 +13,12 @@ UCLASS()
 class CAPTURETHEFLAG_API ACTFPlayerState : public APlayerState
 {
 	GENERATED_BODY()
+
+public:
+	uint8 GetTeamId();
+	void SetTeamId(uint8 InTeamId);
+
+private:
+	uint8 TeamId;
 	
 };
