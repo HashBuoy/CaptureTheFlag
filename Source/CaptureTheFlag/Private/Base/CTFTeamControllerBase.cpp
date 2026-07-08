@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "AI/CTFTeamControllerBase.h"
+#include "Base/CTFTeamControllerBase.h"
 
 uint8 ACTFTeamControllerBase::GetTeamId() const
 {

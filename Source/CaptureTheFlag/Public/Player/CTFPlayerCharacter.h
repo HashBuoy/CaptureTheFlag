@@ -1,26 +1,20 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
-#include "Interface/CTFTeamInterface.h"
-#include "Logging/LogMacros.h"
-#include "CaptureTheFlagCharacter.generated.h"
+#include "Base/CTFCharacterBase.h"
+#include "CTFPlayerCharacter.generated.h"
 
-class USpringArmComponent;
-class UCameraComponent;
-class UInputAction;
 struct FInputActionValue;
-
-DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
-
+class UInputAction;
+class UCameraComponent;
+class USpringArmComponent;
 /**
- *  A simple player-controllable third person character
- *  Implements a controllable orbiting camera
+ * 
  */
-UCLASS(abstract)
-class ACaptureTheFlagCharacter : public ACharacter, public ICTFTeamInterface
+UCLASS()
+class CAPTURETHEFLAG_API ACTFPlayerCharacter : public ACTFCharacterBase
 {
 	GENERATED_BODY()
 
@@ -32,9 +26,11 @@ class ACaptureTheFlagCharacter : public ACharacter, public ICTFTeamInterface
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FollowCamera;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* WeaponMesh;
-	
+public:
+	// Sets default values for this character's properties
+	ACTFPlayerCharacter();
+
+		
 protected:
 
 	/** Jump Input Action */
@@ -52,27 +48,9 @@ protected:
 	/** Mouse Look Input Action */
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* MouseLookAction;
-
-public:
-
-	/** Constructor */
-	ACaptureTheFlagCharacter();	
-
-	//~ Team Interface
-	virtual uint8 GetTeamId_Implementation() const override;
-
-	virtual void SetTeamId(uint8 InTeamId) override;
-	//~~~~~~
 	
-	virtual void PossessedBy(AController* NewController) override;
-	
-protected:
-
 	/** Initialize input action bindings */
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	UFUNCTION(BlueprintNativeEvent)
-	void UpdateVisuals();
 	
 protected:
 
@@ -107,5 +85,5 @@ public:
 
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+	
 };
-

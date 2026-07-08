@@ -11,7 +11,6 @@
 #include "Engine/World.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
-#include "Player/CaptureTheFlagCharacter.h"
 #include "Player/CaptureTheFlagPlayerController.h"
 
 
@@ -163,6 +162,7 @@ void ACTFGameMode::ResetCharacter(ACharacter* Character)
 	{
 		ACTFAgentController* Controller = Character->GetController<ACTFAgentController>();
 		Character->Destroy();
-		Controller->Possess(SpawnTeamAgent(Controller->GetTeamId()));
+		const uint8 TeamId = ICTFTeamInterface::Execute_GetTeamId(Controller);
+		Controller->Possess(SpawnTeamAgent(TeamId));
 	}
 }

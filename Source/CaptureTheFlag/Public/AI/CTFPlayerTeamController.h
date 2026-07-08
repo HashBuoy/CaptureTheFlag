@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CTFTeamControllerBase.h"
+#include "Base/CTFTeamControllerBase.h"
 #include "CTFPlayerTeamController.generated.h"
 
 /**

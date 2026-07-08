@@ -13,39 +13,11 @@ ACTFAgentCharacter::ACTFAgentCharacter()
 
 }
 
-void ACTFAgentCharacter::PossessedBy(AController* NewController)
-{
-	Super::PossessedBy(NewController);
-	UpdateVisuals();
-}
-
-uint8 ACTFAgentCharacter::GetTeamId_Implementation() const
-{
-	if (const ICTFTeamInterface* TeamInterface = Cast<ICTFTeamInterface>(Controller))
-	{
-		return TeamInterface->GetTeamId();
-	}
-	
-	return 255;
-}
-
-void ACTFAgentCharacter::SetTeamId(uint8 InTeamId)
-{
-	if (ICTFTeamInterface* TeamInterface = Cast<ICTFTeamInterface>(Controller))
-	{
-		TeamInterface->SetTeamId(InTeamId);
-	}
-}
-
 // Called when the game starts or when spawned
 void ACTFAgentCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
-}
-
-void ACTFAgentCharacter::UpdateVisuals_Implementation()
-{
 }
 
 // Called every frame
@@ -54,11 +26,3 @@ void ACTFAgentCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
-
-// Called to bind functionality to input
-void ACTFAgentCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-}
-
