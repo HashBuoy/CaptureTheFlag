@@ -4,7 +4,10 @@
 #include "Base/CTFCharacterBase.h"
 
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/CTFAbilitySystemComponent.h"
+#include "AbilitySystem/CTFAttributeSet.h"
 #include "Components/CapsuleComponent.h"
+#include "Data/CTFCharacterDefaultData.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
@@ -38,7 +41,8 @@ ACTFCharacterBase::ACTFCharacterBase()
 	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
 	WeaponMesh->SetupAttachment(GetMesh(),"HandGrip_R");
 
-	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystem"));
+	AbilitySystemComponent = CreateDefaultSubobject<UCTFAbilitySystemComponent>(TEXT("AbilitySystem"));
+	AttributeSet = CreateDefaultSubobject<UCTFAttributeSet>(TEXT("AttributeSet"));
 
 }
 
@@ -70,6 +74,27 @@ void ACTFCharacterBase::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
 	UpdateVisuals();
 	GetAbilitySystemComponent()->InitAbilityActorInfo(this,this);
+	SetupDefaultAbilitiesAndAttributes();
+}
+
+void ACTFCharacterBase::SetupDefaultAbilitiesAndAttributes()
+{
+	// Grant abilities
+	for (auto Ability : DefaultAbilityData->Abilities)
+	{
+		if (Ability != nullptr)
+		{
+			FGameplayAbilitySpec Spec(Ability);
+			Spec.SourceObject = this;
+			AbilitySystemComponent->GiveAbility(Spec);
+		}
+	}
+
+	//Apply default attributes
+	FGameplayEffectContextHandle ContextHandle = AbilitySystemComponent->MakeEffectContext();
+	ContextHandle.AddSourceObject(this);
+	const FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(DefaultAbilityData->Attributes, 1.0f, ContextHandle);
+	AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 }
 
 // Called when the game starts or when spawned

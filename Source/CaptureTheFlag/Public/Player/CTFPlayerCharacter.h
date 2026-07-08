@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Base/CTFCharacterBase.h"
+#include "Data/CTFCharacterDefaultData.h"
 #include "CTFPlayerCharacter.generated.h"
 
 struct FInputActionValue;
