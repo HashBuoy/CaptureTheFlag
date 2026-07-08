@@ -59,9 +59,9 @@ protected:
 	
 protected:
 
-	void AbilityInputPressed(const FInputActionValue& Value, FGameplayTag InputTag) const;
+	void AbilityInputPressed(const FInputActionValue& Value, FGameplayTag InputTag);
 	
-	void AbilityInputReleased(const FInputActionValue& Value, FGameplayTag InputTag) const;
+	void AbilityInputReleased(const FInputActionValue& Value, FGameplayTag InputTag);
 	
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);

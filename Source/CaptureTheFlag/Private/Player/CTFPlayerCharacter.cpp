@@ -52,7 +52,7 @@ void ACTFPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	}
 }
 
-void ACTFPlayerCharacter::AbilityInputPressed(const FInputActionValue& Value, FGameplayTag InputTag) const
+void ACTFPlayerCharacter::AbilityInputPressed(const FInputActionValue& Value, FGameplayTag InputTag)
 {
 	if(!InputTag.IsValid())
 	{
@@ -72,7 +72,7 @@ void ACTFPlayerCharacter::AbilityInputPressed(const FInputActionValue& Value, FG
 	}
 }
 
-void ACTFPlayerCharacter::AbilityInputReleased(const FInputActionValue& Value, FGameplayTag InputTag) const
+void ACTFPlayerCharacter::AbilityInputReleased(const FInputActionValue& Value, FGameplayTag InputTag)
 {
 	if(!InputTag.IsValid())
 	{
