@@ -3,8 +3,10 @@
 
 #include "Player//CTFPlayerCharacter.h"
 
+#include "AbilitySystemComponent.h"
 #include "EnhancedInputComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Data/CTFAbilityInputConfig.h"
 #include "GameFramework/SpringArmComponent.h"
 
 ACTFPlayerCharacter::ACTFPlayerCharacter()
@@ -37,10 +39,52 @@ void ACTFPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::Look);
+
+		for(const FCTFTaggedInputAction& AbilityInputAction: AbilityInputConfig->AbilityInputActions)
+		{
+			EnhancedInputComponent->BindAction(AbilityInputAction.InputAction.Get(), ETriggerEvent::Started, this, &ThisClass::AbilityInputPressed,AbilityInputAction.InputTag);
+			EnhancedInputComponent->BindAction(AbilityInputAction.InputAction.Get(), ETriggerEvent::Completed, this, &ThisClass::AbilityInputReleased,AbilityInputAction.InputTag);
+		}
 	}
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
+	}
+}
+
+void ACTFPlayerCharacter::AbilityInputPressed(const FInputActionValue& Value, FGameplayTag InputTag) const
+{
+	if(!InputTag.IsValid())
+	{
+		return;
+	}
+
+	for(auto& AbilitySpec: AbilitySystemComponent->GetActivatableAbilities())
+	{
+		if(AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(InputTag))
+		{
+			AbilitySystemComponent->AbilitySpecInputPressed(AbilitySpec);
+			if(!AbilitySpec.IsActive())
+			{
+				AbilitySystemComponent->TryActivateAbility(AbilitySpec.Handle);
+			}
+		}
+	}
+}
+
+void ACTFPlayerCharacter::AbilityInputReleased(const FInputActionValue& Value, FGameplayTag InputTag) const
+{
+	if(!InputTag.IsValid())
+	{
+		return;
+	}
+
+	for(auto& AbilitySpec: AbilitySystemComponent->GetActivatableAbilities())
+	{
+		if(AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(InputTag))
+		{
+			AbilitySystemComponent->AbilitySpecInputReleased(AbilitySpec);
+		}
 	}
 }
 

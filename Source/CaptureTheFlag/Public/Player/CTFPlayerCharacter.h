@@ -3,10 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Base/CTFCharacterBase.h"
-#include "Data/CTFCharacterDefaultData.h"
 #include "CTFPlayerCharacter.generated.h"
 
+class UCTFAbilityInputConfig;
 struct FInputActionValue;
 class UInputAction;
 class UCameraComponent;
@@ -50,11 +51,18 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* MouseLookAction;
 	
+	UPROPERTY(EditAnywhere, Category="Input")
+	UCTFAbilityInputConfig* AbilityInputConfig;
+	
 	/** Initialize input action bindings */
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 protected:
 
+	void AbilityInputPressed(const FInputActionValue& Value, FGameplayTag InputTag) const;
+	
+	void AbilityInputReleased(const FInputActionValue& Value, FGameplayTag InputTag) const;
+	
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
 

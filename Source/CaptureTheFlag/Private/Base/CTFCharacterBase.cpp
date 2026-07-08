@@ -86,6 +86,10 @@ void ACTFCharacterBase::SetupDefaultAbilitiesAndAttributes()
 		{
 			FGameplayAbilitySpec Spec(Ability);
 			Spec.SourceObject = this;
+			if(const UCTFGameplayAbilityBase* CTFAbility = Cast<UCTFGameplayAbilityBase>(Spec.Ability))
+			{
+				Spec.GetDynamicSpecSourceTags().AddTag(CTFAbility->InputTag);
+			}
 			AbilitySystemComponent->GiveAbility(Spec);
 		}
 	}

@@ -17,14 +17,7 @@ class CAPTURETHEFLAG_API ACTFCharacterBase : public ACharacter, public ICTFTeamI
 {
 	GENERATED_BODY()
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* WeaponMesh;
-
-	UPROPERTY(VisibleAnywhere, Category="AbilitySystem")
-	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 	
-	UPROPERTY(VisibleAnywhere, Category="AbilitySystem")
-    TObjectPtr<UAttributeSet> AttributeSet;
 	
 public:
 	// Sets default values for this character's properties
@@ -50,6 +43,15 @@ protected:
 	UFUNCTION(BlueprintNativeEvent)
 	void UpdateVisuals();
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	USkeletalMeshComponent* WeaponMesh;
+
+	UPROPERTY(VisibleAnywhere, Category="AbilitySystem")
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
+	
+	UPROPERTY(VisibleAnywhere, Category="AbilitySystem")
+	TObjectPtr<UAttributeSet> AttributeSet;
+	
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
