@@ -13,7 +13,7 @@ void UCTFGA_Stun::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const
 {
 	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
 	{
-		//EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
 
