@@ -13,5 +13,10 @@ UCLASS()
 class CAPTURETHEFLAG_API UCTFAbilitySystemComponent : public UAbilitySystemComponent
 {
 	GENERATED_BODY()
+
+public:
+	bool AbilityInputPressed(FGameplayTag InputTag);
+
+	void AbilityInputReleased(FGameplayTag InputTag);
 	
 };

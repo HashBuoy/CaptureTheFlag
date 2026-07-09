@@ -5,6 +5,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "EnhancedInputComponent.h"
+#include "AbilitySystem/CTFAbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Data/CTFAbilityInputConfig.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -59,17 +60,11 @@ void ACTFPlayerCharacter::AbilityInputPressed(const FInputActionValue& Value, FG
 		return;
 	}
 
-	for(auto& AbilitySpec: AbilitySystemComponent->GetActivatableAbilities())
+	if(UCTFAbilitySystemComponent* ASC = Cast<UCTFAbilitySystemComponent>(GetAbilitySystemComponent()))
 	{
-		if(AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(InputTag))
-		{
-			AbilitySystemComponent->AbilitySpecInputPressed(AbilitySpec);
-			if(!AbilitySpec.IsActive())
-			{
-				AbilitySystemComponent->TryActivateAbility(AbilitySpec.Handle);
-			}
-		}
+		ASC->AbilityInputPressed(InputTag);
 	}
+
 }
 
 void ACTFPlayerCharacter::AbilityInputReleased(const FInputActionValue& Value, FGameplayTag InputTag)
@@ -79,13 +74,11 @@ void ACTFPlayerCharacter::AbilityInputReleased(const FInputActionValue& Value, F
 		return;
 	}
 
-	for(auto& AbilitySpec: AbilitySystemComponent->GetActivatableAbilities())
+	if(UCTFAbilitySystemComponent* ASC = Cast<UCTFAbilitySystemComponent>(GetAbilitySystemComponent()))
 	{
-		if(AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(InputTag))
-		{
-			AbilitySystemComponent->AbilitySpecInputReleased(AbilitySpec);
-		}
+		ASC->AbilityInputReleased(InputTag);
 	}
+
 }
 
 void ACTFPlayerCharacter::Move(const FInputActionValue& Value)
