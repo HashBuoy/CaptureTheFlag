@@ -106,6 +106,10 @@ void ACTFCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UCTFAttributeSet::GetSpeedAttribute()).AddUObject(this, &ThisClass::OnSpeedAttributeChanged);
+	}
 }
 
 void ACTFCharacterBase::UpdateVisuals_Implementation()
@@ -117,5 +121,10 @@ void ACTFCharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ACTFCharacterBase::OnSpeedAttributeChanged(const FOnAttributeChangeData& OnAttributeChangeData) const
+{
+	GetCharacterMovement()->MaxWalkSpeed = OnAttributeChangeData.NewValue;
 }
 

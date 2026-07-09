@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
+#include "GameplayEffectTypes.h"
 #include "GameFramework/Character.h"
 #include "Interface/CTFTeamInterface.h"
 #include "CTFCharacterBase.generated.h"
@@ -37,6 +38,7 @@ public:
 	void SetupDefaultAbilitiesAndAttributes();
 
 protected:
+	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -60,4 +62,5 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="Ability")
 	UCTFCharacterDefaultData* DefaultAbilityData;
 
+	void OnSpeedAttributeChanged(const FOnAttributeChangeData& OnAttributeChangeData) const;
 };
