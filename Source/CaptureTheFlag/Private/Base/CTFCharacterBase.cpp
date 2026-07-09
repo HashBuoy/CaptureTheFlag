@@ -6,7 +6,9 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/CTFAbilitySystemComponent.h"
 #include "AbilitySystem/CTFAttributeSet.h"
+#include "Component/CTFBillboardWidgetComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/WidgetComponent.h"
 #include "Data/CTFCharacterDefaultData.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -41,6 +43,14 @@ ACTFCharacterBase::ACTFCharacterBase()
 	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
 	WeaponMesh->SetupAttachment(GetMesh(),"HandGrip_R");
 
+	//Health Widget
+	HealthWidget = CreateDefaultSubobject<UCTFBillboardWidgetComponent>(TEXT("HealthWidget"));
+	HealthWidget->SetupAttachment(RootComponent.Get());
+	HealthWidget->SetRelativeLocation(FVector(0.f, 0.f, 120.f));
+	HealthWidget->SetWidgetSpace(EWidgetSpace::World);
+	HealthWidget->SetDrawSize(FVector2D(120.f, 30.f));
+	HealthWidget->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
 	AbilitySystemComponent = CreateDefaultSubobject<UCTFAbilitySystemComponent>(TEXT("AbilitySystem"));
 	AttributeSet = CreateDefaultSubobject<UCTFAttributeSet>(TEXT("AttributeSet"));
 
@@ -48,9 +58,9 @@ ACTFCharacterBase::ACTFCharacterBase()
 
 uint8 ACTFCharacterBase::GetTeamId_Implementation() const
 {
-	if (const ICTFTeamInterface* TeamInterface = Cast<ICTFTeamInterface>(Controller))
+	if (Controller && Controller->Implements<UCTFTeamInterface>())
 	{
-		return TeamInterface->GetTeamId();
+		return ICTFTeamInterface::Execute_GetTeamId(Controller);
 	}
 	
 	return 255;
@@ -75,6 +85,11 @@ void ACTFCharacterBase::PossessedBy(AController* NewController)
 	UpdateVisuals();
 	GetAbilitySystemComponent()->InitAbilityActorInfo(this,this);
 	SetupDefaultAbilitiesAndAttributes();
+
+	if(IsPlayerControlled())
+	{
+		HealthWidget->SetVisibility(false);
+	}
 }
 
 void ACTFCharacterBase::SetupDefaultAbilitiesAndAttributes()
@@ -109,6 +124,7 @@ void ACTFCharacterBase::BeginPlay()
 	if (AbilitySystemComponent)
 	{
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UCTFAttributeSet::GetSpeedAttribute()).AddUObject(this, &ThisClass::OnSpeedAttributeChanged);
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UCTFAttributeSet::GetHealthAttribute()).AddUObject(this, &ThisClass::OnHealthAttributeChanged);
 	}
 }
 
@@ -126,5 +142,11 @@ void ACTFCharacterBase::Tick(float DeltaTime)
 void ACTFCharacterBase::OnSpeedAttributeChanged(const FOnAttributeChangeData& OnAttributeChangeData) const
 {
 	GetCharacterMovement()->MaxWalkSpeed = OnAttributeChangeData.NewValue;
+	OnAttributeChanged.Broadcast(OnAttributeChangeData.Attribute,OnAttributeChangeData.NewValue);
+}
+
+void ACTFCharacterBase::OnHealthAttributeChanged(const FOnAttributeChangeData& OnAttributeChangeData) const
+{
+	OnAttributeChanged.Broadcast(OnAttributeChangeData.Attribute,OnAttributeChangeData.NewValue);
 }
 

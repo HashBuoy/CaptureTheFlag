@@ -9,9 +9,13 @@
 #include "Interface/CTFTeamInterface.h"
 #include "CTFCharacterBase.generated.h"
 
+class UCTFBillboardWidgetComponent;
+class UWidgetComponent;
 class UAttributeSet;
 class UCTFCharacterDefaultData;
 class USkeletalMeshComponent;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnAttributeChanged,FGameplayAttribute, Attribute,float, NewValue);
 
 UCLASS()
 class CAPTURETHEFLAG_API ACTFCharacterBase : public ACharacter, public ICTFTeamInterface , public IAbilitySystemInterface
@@ -36,7 +40,10 @@ public:
 	
 	virtual void PossessedBy(AController* NewController) override;
 	void SetupDefaultAbilitiesAndAttributes();
-
+	
+	UPROPERTY(BlueprintAssignable, Category="Attributes")
+	FOnAttributeChanged OnAttributeChanged;
+	
 protected:
 	
 	// Called when the game starts or when spawned
@@ -53,6 +60,9 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, Category="AbilitySystem")
 	TObjectPtr<UAttributeSet> AttributeSet;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UCTFBillboardWidgetComponent> HealthWidget;
 	
 public:	
 	// Called every frame
@@ -63,4 +73,5 @@ private:
 	UCTFCharacterDefaultData* DefaultAbilityData;
 
 	void OnSpeedAttributeChanged(const FOnAttributeChangeData& OnAttributeChangeData) const;
+	void OnHealthAttributeChanged(const FOnAttributeChangeData& OnAttributeChangeData) const;
 };
