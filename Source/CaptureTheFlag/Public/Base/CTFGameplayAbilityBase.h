@@ -16,7 +16,7 @@ class CAPTURETHEFLAG_API UCTFGameplayAbilityBase : public UGameplayAbility
 	
 public:
 	/** Tags that trigger this ability via input */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input", meta=(Categories="Input"))
 	FGameplayTag InputTag;
 	
 };
