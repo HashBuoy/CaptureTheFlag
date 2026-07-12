@@ -44,6 +44,8 @@ public:
 	UPROPERTY(BlueprintAssignable, Category="Attributes")
 	FOnAttributeChanged OnAttributeChanged;
 	
+	FVector GetMuzzleLocation() const;
+	
 protected:
 	
 	// Called when the game starts or when spawned
@@ -73,5 +75,5 @@ private:
 	UCTFCharacterDefaultData* DefaultAbilityData;
 
 	void OnSpeedAttributeChanged(const FOnAttributeChangeData& OnAttributeChangeData) const;
-	void OnHealthAttributeChanged(const FOnAttributeChangeData& OnAttributeChangeData) const;
+	void OnHealthAttributeChanged(const FOnAttributeChangeData& OnAttributeChangeData);
 };

@@ -9,8 +9,10 @@
 #include "Component/CTFBillboardWidgetComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
+#include "Core/CTFGameMode.h"
 #include "Data/CTFCharacterDefaultData.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Utils/CTFBlueprintFunctionLibrary.h"
 
 // Sets default values
 ACTFCharacterBase::ACTFCharacterBase()
@@ -116,6 +118,16 @@ void ACTFCharacterBase::SetupDefaultAbilitiesAndAttributes()
 	AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 }
 
+FVector ACTFCharacterBase::GetMuzzleLocation() const
+{
+	if (!WeaponMesh || !WeaponMesh->DoesSocketExist("MUZZLE"))
+	{
+		return FVector::Zero();
+	}
+
+	return WeaponMesh->GetSocketTransform("MUZZLE",	RTS_World).GetLocation();
+}
+
 // Called when the game starts or when spawned
 void ACTFCharacterBase::BeginPlay()
 {
@@ -145,8 +157,16 @@ void ACTFCharacterBase::OnSpeedAttributeChanged(const FOnAttributeChangeData& On
 	OnAttributeChanged.Broadcast(OnAttributeChangeData.Attribute,OnAttributeChangeData.NewValue);
 }
 
-void ACTFCharacterBase::OnHealthAttributeChanged(const FOnAttributeChangeData& OnAttributeChangeData) const
+void ACTFCharacterBase::OnHealthAttributeChanged(const FOnAttributeChangeData& OnAttributeChangeData)
 {
 	OnAttributeChanged.Broadcast(OnAttributeChangeData.Attribute,OnAttributeChangeData.NewValue);
+	
+	if(OnAttributeChangeData.NewValue<=0)
+	{
+		if(ACTFGameMode* GameMode = UCTFBlueprintFunctionLibrary::GetCTFGameMode(this))
+		{
+			GameMode->ResetCharacter(this);
+		}
+	}
 }
 

@@ -20,4 +20,6 @@ public:
 	// GameplayAbility interface
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Rune")
+	TSubclassOf<UGameplayEffect> DamageEffectClass;
 };
