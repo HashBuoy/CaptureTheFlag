@@ -76,4 +76,6 @@ private:
 
 	void OnSpeedAttributeChanged(const FOnAttributeChangeData& OnAttributeChangeData) const;
 	void OnHealthAttributeChanged(const FOnAttributeChangeData& OnAttributeChangeData);
+
+	void OnStateStunChanged(FGameplayTag GameplayTag, int Count);
 };

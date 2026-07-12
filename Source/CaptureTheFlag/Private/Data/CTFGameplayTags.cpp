@@ -4,7 +4,7 @@
 #include "Data/CTFGameplayTags.h"
 
 
-namespace RQGameplayTags
+namespace CTFGameplayTags
 {
     namespace Input
     {

@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Base/CTFGameplayAbilityBase.h"
-#include "CTFGA_Shoot.generated.h"
+#include "CTFGA_HitScan.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class CAPTURETHEFLAG_API UCTFGA_Shoot : public UCTFGameplayAbilityBase
+class CAPTURETHEFLAG_API UCTFGA_HitScan : public UCTFGameplayAbilityBase
 {
 	GENERATED_BODY()
 	
 public:
-	UCTFGA_Shoot();
+	UCTFGA_HitScan();
 
 	// GameplayAbility interface
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;

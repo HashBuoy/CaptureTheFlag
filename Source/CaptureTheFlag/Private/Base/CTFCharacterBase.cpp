@@ -11,6 +11,7 @@
 #include "Components/WidgetComponent.h"
 #include "Core/CTFGameMode.h"
 #include "Data/CTFCharacterDefaultData.h"
+#include "Data/CTFGameplayTags.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Utils/CTFBlueprintFunctionLibrary.h"
 
@@ -137,6 +138,7 @@ void ACTFCharacterBase::BeginPlay()
 	{
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UCTFAttributeSet::GetSpeedAttribute()).AddUObject(this, &ThisClass::OnSpeedAttributeChanged);
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UCTFAttributeSet::GetHealthAttribute()).AddUObject(this, &ThisClass::OnHealthAttributeChanged);
+		AbilitySystemComponent->RegisterGameplayTagEvent(CTFGameplayTags::State::Stunned,	EGameplayTagEventType::NewOrRemoved).AddUObject(this, &ThisClass::OnStateStunChanged);
 	}
 }
 
@@ -170,3 +172,17 @@ void ACTFCharacterBase::OnHealthAttributeChanged(const FOnAttributeChangeData& O
 	}
 }
 
+
+void ACTFCharacterBase::OnStateStunChanged(FGameplayTag GameplayTag, int Count)
+{
+	if (Count > 0)
+	{
+		GetCharacterMovement()->DisableMovement();
+		Controller->SetIgnoreMoveInput(true);
+	}
+	else
+	{
+		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		Controller->ResetIgnoreMoveInput();
+	}
+}

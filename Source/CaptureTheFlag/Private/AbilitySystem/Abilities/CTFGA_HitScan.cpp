@@ -1,17 +1,17 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "AbilitySystem/Abilities/CTFGA_Shoot.h"
+#include "AbilitySystem/Abilities/CTFGA_HitScan.h"
 
 #include "AbilitySystemComponent.h"
 #include "Player/CTFPlayerCharacter.h"
 
-UCTFGA_Shoot::UCTFGA_Shoot()
+UCTFGA_HitScan::UCTFGA_HitScan()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
-void UCTFGA_Shoot::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
+void UCTFGA_HitScan::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
