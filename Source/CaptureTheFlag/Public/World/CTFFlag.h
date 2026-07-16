@@ -8,6 +8,7 @@
 #include "GameFramework/Actor.h"
 #include "CTFFlag.generated.h"
 
+class USphereComponent;
 UCLASS()
 class CAPTURETHEFLAG_API ACTFFlag : public AActor
 {
@@ -17,10 +18,12 @@ public:
 	// Sets default values for this actor's properties
 	ACTFFlag();
 
-	void PickFlag(ACTFCharacterBase* InCarrier);
+	bool PickFlag(ACTFCharacterBase* InCarrier);
 
 	void DropFlag();
 
+	float GetPickUpDistance() const {return PickUpDistance;};
+	
 	ACTFCharacterBase* GetCurrentCarrier() const {return Carrier;};
 	
 protected:
@@ -38,7 +41,37 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UStaticMeshComponent> FlagMesh;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<USphereComponent> InteractionSphere;
+
+	UPROPERTY(EditDefaultsOnly)
+	float PickUpDistance;
+
+#if WITH_EDITOR
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
+	
 private:
 	UPROPERTY(Transient)
 	ACTFCharacterBase* Carrier;
+	
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UWidgetComponent> PromptWidget;
+	
+	//Sphere overlap functions
+	UFUNCTION()
+	void OnSphereBeginOverlap(
+		UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnSphereEndOverlap(
+		UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex);
 };

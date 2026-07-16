@@ -3,6 +3,9 @@
 
 #include "World/CTFFlag.h"
 
+#include "Components/SphereComponent.h"
+#include "Components/WidgetComponent.h"
+
 // Sets default values
 ACTFFlag::ACTFFlag()
 {
@@ -30,12 +33,46 @@ ACTFFlag::ACTFFlag()
 	FlagMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
 	FlagMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	FlagMesh->SetGenerateOverlapEvents(true);
-	
+
+	InteractionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("InteractionSphere"));
+	InteractionSphere->SetupAttachment(RootComponent.Get());
+	InteractionSphere->InitSphereRadius(200.0f);
+	InteractionSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	InteractionSphere->SetCollisionObjectType(ECC_WorldDynamic);
+	// Ignore everything
+	InteractionSphere->SetCollisionResponseToAllChannels(ECR_Ignore);
+	// Overlap only pawns
+	InteractionSphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	//Delegates
+	InteractionSphere->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnSphereBeginOverlap);
+	InteractionSphere->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnSphereEndOverlap);
+
+	PromptWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("PromptWidget"));
+	PromptWidget->SetupAttachment(RootComponent);
+	PromptWidget->SetWidgetSpace(EWidgetSpace::Screen);
+	PromptWidget->SetVisibility(false);
 }
 
-void ACTFFlag::PickFlag(ACTFCharacterBase* InCarrier)
+bool ACTFFlag::PickFlag(ACTFCharacterBase* InCarrier)
 {
+	if(!IsValid(InCarrier))
+	{
+		return false;
+	}
+
+	if(IsValid(Carrier))
+	{
+		return false;
+	}
+	
+	if(const float Distance = FVector::DistSquared2D(this->GetActorLocation(),InCarrier->GetActorLocation()); Distance>FMath::Square(PickUpDistance))
+	{
+		return  false;
+	}
+	
 	Carrier = InCarrier;
+	PromptWidget->SetVisibility(false);
+	return true;
 }
 
 void ACTFFlag::DropFlag()
@@ -43,6 +80,7 @@ void ACTFFlag::DropFlag()
 	Carrier = nullptr;
 
 	//Trace and drop on the ground vertically
+	
 }
 
 // Called when the game starts or when spawned
@@ -57,5 +95,45 @@ void ACTFFlag::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+#if WITH_EDITOR
+void ACTFFlag::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+	if (PropertyChangedEvent.GetPropertyName() == GET_MEMBER_NAME_CHECKED(ThisClass, PickUpDistance))
+	{
+		InteractionSphere->SetSphereRadius(PickUpDistance);
+	}
+}
+#endif
+
+void ACTFFlag::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+                                    UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) 
+{
+	if(IsValid(Carrier))
+	{
+		return;
+	}
+	
+	if (const APawn* Pawn = Cast<APawn>(OtherActor))
+	{
+		if (Pawn->IsPlayerControlled())
+		{
+			PromptWidget->SetVisibility(true);
+		}
+	}
+}
+
+void ACTFFlag::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) 
+{
+	if (const APawn* Pawn = Cast<APawn>(OtherActor))
+	{
+		if (Pawn->IsPlayerControlled())
+		{
+			PromptWidget->SetVisibility(false);
+		}
+	}
 }
 

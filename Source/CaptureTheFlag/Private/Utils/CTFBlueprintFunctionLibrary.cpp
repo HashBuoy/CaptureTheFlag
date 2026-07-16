@@ -3,6 +3,7 @@
 
 #include "Utils/CTFBlueprintFunctionLibrary.h"
 
+#include "EngineUtils.h"
 #include "Core/CTFGameMode.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -29,4 +30,25 @@ FLinearColor UCTFBlueprintFunctionLibrary::GetTeamColor(uint8 TeamId)
 	default:
 		return FLinearColor::White;
 	}
+}
+
+ACTFFlag* UCTFBlueprintFunctionLibrary::GetFlag(const UObject* WorldContextObject)
+{
+	if (!WorldContextObject)
+	{
+		return nullptr;
+	}
+
+	UWorld* World = WorldContextObject->GetWorld();
+	if (!World)
+	{
+		return nullptr;
+	}
+
+	for (TActorIterator<ACTFFlag> It(World); It; ++It)
+	{
+		return *It;
+	}
+
+	return nullptr;
 }
