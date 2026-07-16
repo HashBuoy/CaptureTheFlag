@@ -3,8 +3,9 @@
 
 #include "AbilitySystem/Abilities/CTFGA_CarryFlag.h"
 
-#include "Abilities/Tasks/AbilityTask_WaitInputPress.h"
+#include "AbilitySystemComponent.h"
 #include "Abilities/Tasks/AbilityTask_WaitInputRelease.h"
+#include "Data/CTFGameplayTags.h"
 #include "Utils/CTFBlueprintFunctionLibrary.h"
 
 UCTFGA_CarryFlag::UCTFGA_CarryFlag()
@@ -30,18 +31,19 @@ void UCTFGA_CarryFlag::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 	}
 
 	ACTFCharacterBase* Character = Cast<ACTFCharacterBase>(CurrentActorInfo->AvatarActor.Get());
-	if(Flag->PickFlag(Character))
-	{
-		Flag->AttachToComponent(Character->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale,TEXT("FlagSocket"));
-	}
-	else
+	if(!Flag->PickFlag(Character))
 	{
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+		return;
 	}
+
+	Flag->AttachToComponent(Character->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale,TEXT("FlagSocket"));
+	
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo();
+	ASC->RegisterGameplayTagEvent(CTFGameplayTags::State::Stunned,EGameplayTagEventType::NewOrRemoved).AddUObject(this, &UCTFGA_CarryFlag::OnStunChanged);
 }
 
-void UCTFGA_CarryFlag::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
-                                  const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+void UCTFGA_CarryFlag::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 
@@ -54,4 +56,12 @@ void UCTFGA_CarryFlag::EndAbility(const FGameplayAbilitySpecHandle Handle, const
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 	
+}
+
+void UCTFGA_CarryFlag::OnStunChanged(FGameplayTag GameplayTag, int Count)
+{
+	if(Count > 0)
+	{
+		EndAbility(	CurrentSpecHandle,CurrentActorInfo,CurrentActivationInfo,true,true);
+	}
 }
