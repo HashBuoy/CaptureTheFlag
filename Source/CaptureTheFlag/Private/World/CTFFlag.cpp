@@ -80,7 +80,25 @@ void ACTFFlag::DropFlag()
 	Carrier = nullptr;
 
 	//Trace and drop on the ground vertically
+	FVector Start = GetActorLocation() + FVector(0.f, 0.f, 200.f);
+	FVector End   = Start - FVector(0.f, 0.f, 5000.f);
+
+	FHitResult Hit;
+
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
 	
+	if (GetWorld()->LineTraceSingleByChannel(Hit,Start,End,ECC_WorldStatic,Params))
+	{
+		SetActorLocation(Hit.Location);
+
+		// Keep flag upright
+		SetActorRotation(FRotator::ZeroRotator);
+	}
+	else
+	{
+		//Place back to center of the map
+	}
 }
 
 // Called when the game starts or when spawned
