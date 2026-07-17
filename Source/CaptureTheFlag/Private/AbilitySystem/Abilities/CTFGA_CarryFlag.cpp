@@ -45,12 +45,9 @@ void UCTFGA_CarryFlag::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 
 void UCTFGA_CarryFlag::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
-	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
-
 	UE_LOG(LogTemp,Error,TEXT("CarryFlag EndAbility"));
 	if(IsValid(Flag))
 	{
-		Flag->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		Flag->DropFlag();
 	}
 

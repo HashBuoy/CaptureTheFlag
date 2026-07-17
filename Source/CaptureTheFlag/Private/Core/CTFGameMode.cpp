@@ -149,7 +149,7 @@ void ACTFGameMode::ResetCharacter(ACharacter* Character)
 {
 	if(!IsValid(Character))
 	{
-		return;;
+		return;
 	}
 
 	if(Character->GetController()->IsA(ACaptureTheFlagPlayerController::StaticClass()))

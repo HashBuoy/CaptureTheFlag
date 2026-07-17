@@ -78,7 +78,8 @@ bool ACTFFlag::PickFlag(ACTFCharacterBase* InCarrier)
 void ACTFFlag::DropFlag()
 {
 	Carrier = nullptr;
-
+	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	
 	//Trace and drop on the ground vertically
 	FVector Start = GetActorLocation() + FVector(0.f, 0.f, 200.f);
 	FVector End   = Start - FVector(0.f, 0.f, 5000.f);
