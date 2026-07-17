@@ -53,6 +53,20 @@ ACTFFlag::ACTFFlag()
 	PromptWidget->SetVisibility(false);
 }
 
+// Called when the game starts or when spawned
+void ACTFFlag::BeginPlay()
+{
+	Super::BeginPlay();
+
+	InitialTransform = GetActorTransform();
+}
+
+void ACTFFlag::Reset()
+{
+	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	SetActorTransform(InitialTransform);
+}
+
 bool ACTFFlag::PickFlag(ACTFCharacterBase* InCarrier)
 {
 	if(!IsValid(InCarrier))
@@ -94,20 +108,15 @@ void ACTFFlag::DropFlag()
 		SetActorLocation(Hit.Location);
 
 		// Keep flag upright
-		SetActorRotation(FRotator::ZeroRotator);
+		SetActorRotation(InitialTransform.Rotator());
 	}
 	else
 	{
-		//Place back to center of the map
+		Reset();
 	}
 }
 
-// Called when the game starts or when spawned
-void ACTFFlag::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
+
 
 // Called every frame
 void ACTFFlag::Tick(float DeltaTime)

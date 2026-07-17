@@ -17,6 +17,8 @@ class CAPTURETHEFLAG_API ACTFFlag : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ACTFFlag();
+	
+	void Reset();
 
 	bool PickFlag(ACTFCharacterBase* InCarrier);
 
@@ -57,6 +59,8 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UWidgetComponent> PromptWidget;
+
+	FTransform InitialTransform;
 	
 	//Sphere overlap functions
 	UFUNCTION()

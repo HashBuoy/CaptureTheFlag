@@ -7,6 +7,7 @@
 #include "AI/CTFAgentController.h"
 #include "AI/CTFAITeamController.h"
 #include "AI/CTFPlayerTeamController.h"
+#include "Core/CTFGameState.h"
 #include "Data/CTFGameData.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerStart.h"
@@ -27,8 +28,44 @@ void ACTFGameMode::OnPostLogin(AController* NewPlayer)
 void ACTFGameMode::HandleMatchHasStarted()
 {
 	Super::HandleMatchHasStarted();
-	
 	SpawnTeamControllers();
+	StartNewRound();
+}
+
+void ACTFGameMode::FlagCaptured(uint8 TeamId)
+{
+	ACTFGameState* GameState = GetGameState<ACTFGameState>();
+	if (!IsValid(GameState))
+	{
+		return;
+	}
+
+	GameState->IncrementScore(TeamId);
+	ResetRound();
+}
+
+void ACTFGameMode::ResetRound()
+{
+	ACTFGameState* GameState = GetGameState<ACTFGameState>();
+	if (!IsValid(GameState))
+	{
+		return;
+	}
+
+	GameState->SetRoundState(ECTFRoundState::Reset);
+	StartNewRound();
+}
+
+void ACTFGameMode::StartNewRound()
+{
+	ACTFGameState* GameState = GetGameState<ACTFGameState>();
+    if (!IsValid(GameState))
+    {
+       return;
+    }
+	
+	GameState->IncrementRound();
+	GameState->SetRoundState(ECTFRoundState::Start);
 }
 
 AActor* ACTFGameMode::ChoosePlayerStart_Implementation(AController* Player)
@@ -37,14 +74,20 @@ AActor* ACTFGameMode::ChoosePlayerStart_Implementation(AController* Player)
 	return GetPlayerStartForTeam(0);
 }
 
-
-
 void ACTFGameMode::SpawnTeamControllers()
 {
+	ACTFGameState* GameState = GetGameState<ACTFGameState>();
+	if (!IsValid(GameState))
+	{
+		return;
+	}
+	
 	CachePlayerStart();
 	
 	for(int32 i = 0 ; i < GameData->NumOfTeams; i++)
 	{
+		GameState->AddTeam(i);
+		
 		const APlayerStart* PlayerStart = PlayerStart = GetPlayerStartForTeam(i);
 		if(!IsValid(PlayerStart))
 		{

@@ -39,10 +39,16 @@ private:
 	
 	APlayerStart* GetPlayerStartForTeam(uint8 TeamId);
 	
+	void FlagCaptured(uint8 TeamId);
+	
 protected:
 	virtual void OnPostLogin(AController* NewPlayer) override;
 	
 	virtual void HandleMatchHasStarted() override;
+	
+	void ResetRound();
+	
+	void StartNewRound();
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category=Data)

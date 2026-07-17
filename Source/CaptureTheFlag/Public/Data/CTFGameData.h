@@ -22,6 +22,5 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	int32 NumOfRounds = 3;
-
 	
 };
