@@ -10,7 +10,8 @@ enum class ECTFRoundState : uint8
 {
 	None,
 	Reset,
-	Start,
-	Completed,
+	Countdown,
+	Started,
+	Captured,
 	Max
 };

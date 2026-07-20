@@ -7,8 +7,12 @@
 #include "InputMappingContext.h"
 #include "Blueprint/UserWidget.h"
 #include "CaptureTheFlag.h"
+#include "Core/CTFGameState.h"
 #include "Player/CTFPlayerState.h"
+#include "Utils/CTFBlueprintFunctionLibrary.h"
 #include "Widgets/Input/SVirtualJoystick.h"
+#include "World/CTFFlag.h"
+#include "World/CTFVictoryCamera.h"
 
 uint8 ACaptureTheFlagPlayerController::GetTeamId_Implementation() const
 {
@@ -42,6 +46,12 @@ void ACaptureTheFlagPlayerController::BeginPlay()
 		}
 
 	}
+
+	
+	if (ACTFGameState* GameState = GetWorld()->GetGameState<ACTFGameState>())
+	{
+		GameState->OnRoundStateChanged.AddDynamic(this,	&ThisClass::OnRoundStateChanged);
+	}
 }
 
 void ACaptureTheFlagPlayerController::SetupInputComponent()
@@ -68,5 +78,52 @@ void ACaptureTheFlagPlayerController::SetupInputComponent()
 				}
 			}
 		}
+	}
+}
+
+void ACaptureTheFlagPlayerController::OnRoundStateChanged(ECTFRoundState RoundState)
+{
+	switch (RoundState)
+	{
+	case ECTFRoundState::Captured:
+		{
+			SetIgnoreMoveInput(true);
+			SetIgnoreLookInput(true);
+
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+			ACTFFlag* Flag = UCTFBlueprintFunctionLibrary::GetFlag(this);
+			VictoryCamera = GetWorld()->SpawnActor<ACTFVictoryCamera>(VictoryCameraClass,Flag->GetActorLocation(),FRotator::ZeroRotator, SpawnParams);
+			if (!IsValid(VictoryCamera))
+			{
+				return;
+			}
+		
+			VictoryCamera->SetTarget(Flag);
+			SetViewTargetWithBlend(	VictoryCamera,1.0f,VTBlend_Cubic);
+		
+			break;
+		}
+
+	case ECTFRoundState::Reset:
+		SetIgnoreMoveInput(true);
+		SetIgnoreLookInput(true);
+		//Delete Victory Cam
+		break;
+
+	case ECTFRoundState::Countdown:
+		//Disable Input
+		SetIgnoreMoveInput(true);
+		SetIgnoreLookInput(true);
+		break;
+
+	case ECTFRoundState::Started:
+		//Enable Input
+		ResetIgnoreInputFlags();
+		break;
+		
+		default:;
 	}
 }

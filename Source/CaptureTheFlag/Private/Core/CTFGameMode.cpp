@@ -13,6 +13,7 @@
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/CaptureTheFlagPlayerController.h"
+#include "Utils/CTFBlueprintFunctionLibrary.h"
 
 
 void ACTFGameMode::OnPostLogin(AController* NewPlayer)
@@ -29,43 +30,66 @@ void ACTFGameMode::HandleMatchHasStarted()
 {
 	Super::HandleMatchHasStarted();
 	SpawnTeamControllers();
-	StartNewRound();
+	
+	StartCountdown();
 }
 
 void ACTFGameMode::FlagCaptured(uint8 TeamId)
 {
-	ACTFGameState* GameState = GetGameState<ACTFGameState>();
-	if (!IsValid(GameState))
+	ACTFGameState* CTFGameState = GetGameState<ACTFGameState>();
+	if (!IsValid(CTFGameState))
 	{
 		return;
 	}
 
-	GameState->IncrementScore(TeamId);
-	ResetRound();
+	CTFGameState->IncrementScore(TeamId);
+	CTFGameState->SetRoundState(ECTFRoundState::Captured);
+	ACTFFlag* Flag = UCTFBlueprintFunctionLibrary::GetFlag(this);
+	if(IsValid(Flag))
+	{
+		Flag->DropFlag();	
+	}
+	
+	FTimerHandle VictoryTimer;
+	GetWorldTimerManager().SetTimer(VictoryTimer, this,  &ACTFGameMode::ResetRound,  3.0f,  false );
 }
 
 void ACTFGameMode::ResetRound()
 {
-	ACTFGameState* GameState = GetGameState<ACTFGameState>();
-	if (!IsValid(GameState))
+	ACTFGameState* CTFGameState = GetGameState<ACTFGameState>();
+	if (!IsValid(CTFGameState))
 	{
 		return;
 	}
 
-	GameState->SetRoundState(ECTFRoundState::Reset);
-	StartNewRound();
+	CTFGameState->SetRoundState(ECTFRoundState::Reset);
+	StartCountdown();
+}
+
+void ACTFGameMode::StartCountdown()
+{
+	ACTFGameState* CTFGameState = GetGameState<ACTFGameState>();
+	if (!IsValid(CTFGameState))
+	{
+		return;
+	}
+	
+	CTFGameState->SetRoundState(ECTFRoundState::Countdown);
+	
+	FTimerHandle CountdownTimer;
+	GetWorldTimerManager().SetTimer(CountdownTimer, this,  &ACTFGameMode::StartNewRound,  3.0f,  false );
 }
 
 void ACTFGameMode::StartNewRound()
 {
-	ACTFGameState* GameState = GetGameState<ACTFGameState>();
-    if (!IsValid(GameState))
+	ACTFGameState* CTFGameState = GetGameState<ACTFGameState>();
+    if (!IsValid(CTFGameState))
     {
        return;
     }
 	
-	GameState->IncrementRound();
-	GameState->SetRoundState(ECTFRoundState::Start);
+	CTFGameState->IncrementRound();
+	CTFGameState->SetRoundState(ECTFRoundState::Started);
 }
 
 AActor* ACTFGameMode::ChoosePlayerStart_Implementation(AController* Player)
@@ -76,8 +100,8 @@ AActor* ACTFGameMode::ChoosePlayerStart_Implementation(AController* Player)
 
 void ACTFGameMode::SpawnTeamControllers()
 {
-	ACTFGameState* GameState = GetGameState<ACTFGameState>();
-	if (!IsValid(GameState))
+	ACTFGameState* CTFGameState = GetGameState<ACTFGameState>();
+	if (!IsValid(CTFGameState))
 	{
 		return;
 	}
@@ -86,7 +110,7 @@ void ACTFGameMode::SpawnTeamControllers()
 	
 	for(int32 i = 0 ; i < GameData->NumOfTeams; i++)
 	{
-		GameState->AddTeam(i);
+		CTFGameState->AddTeam(i);
 		
 		const APlayerStart* PlayerStart = PlayerStart = GetPlayerStartForTeam(i);
 		if(!IsValid(PlayerStart))

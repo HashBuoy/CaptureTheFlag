@@ -25,6 +25,8 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void ResetCharacter(ACharacter* Character);
+
+	void FlagCaptured(uint8 TeamId);
 	
 private:
 	void CachePlayerStart();
@@ -39,7 +41,7 @@ private:
 	
 	APlayerStart* GetPlayerStartForTeam(uint8 TeamId);
 	
-	void FlagCaptured(uint8 TeamId);
+	
 	
 protected:
 	virtual void OnPostLogin(AController* NewPlayer) override;
@@ -47,7 +49,8 @@ protected:
 	virtual void HandleMatchHasStarted() override;
 	
 	void ResetRound();
-	
+	void StartCountdown();
+
 	void StartNewRound();
 
 private:

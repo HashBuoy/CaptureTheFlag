@@ -7,6 +7,8 @@
 #include "Interface/CTFTeamInterface.h"
 #include "CaptureTheFlagPlayerController.generated.h"
 
+class ACTFVictoryCamera;
+enum class ECTFRoundState : uint8;
 class UInputMappingContext;
 class UUserWidget;
 
@@ -48,4 +50,13 @@ protected:
 	/** Input mapping context setup */
 	virtual void SetupInputComponent() override;
 
+	UFUNCTION()
+	void OnRoundStateChanged(ECTFRoundState RoundState);
+
+private:
+	UPROPERTY(Transient)
+	ACTFVictoryCamera* VictoryCamera;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<ACTFVictoryCamera> VictoryCameraClass;
 };

@@ -5,6 +5,11 @@
 
 void ACTFGameState::SetRoundState(ECTFRoundState NewRoundState)
 {
+	if(CurrentRoundState == NewRoundState)
+	{
+		return;
+	}
+	
 	CurrentRoundState = NewRoundState;
 	OnRoundStateChanged.Broadcast(CurrentRoundState);
 }
