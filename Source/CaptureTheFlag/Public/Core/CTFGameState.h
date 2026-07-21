@@ -8,6 +8,7 @@
 #include "CTFGameState.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRoundStateChanged, ECTFRoundState, RoundState);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRoundWon, uint8, TeamId);
 
 /**
  * 
@@ -21,6 +22,9 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnRoundStateChanged OnRoundStateChanged;
 
+	UPROPERTY(BlueprintAssignable)
+	FOnRoundWon OnRoundWon;
+
 	void SetRoundState(ECTFRoundState NewRoundState);
 
 	void IncrementRound();
@@ -29,14 +33,18 @@ public:
 
 	ECTFRoundState GetCurrentRoundState() const;
 
+	UFUNCTION(BlueprintCallable)
 	uint8 GetCurrentRound() const;
 	
 	void AddTeam(uint8 TeamId);
 
+	UFUNCTION(BlueprintCallable)
+	uint8 GetTeamScore(uint8 TeamId);
+
 private:
 	ECTFRoundState CurrentRoundState;
 	
-	uint8 CurrentRound = 0;
+	uint8 CurrentRound = 1;
 
 	TMap<uint8, uint8> TeamScoreMap;
 };

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "Base/CTFCharacterBase.h"
+#include "Data/CTFEnums.h"
 #include "GameFramework/Actor.h"
 #include "CTFFlag.generated.h"
 
@@ -29,8 +30,12 @@ public:
 	ACTFCharacterBase* GetCurrentCarrier() const {return Carrier;};
 	
 protected:
+	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	void OnRoundStateChanged(ECTFRoundState RoundState);
 
 public:	
 	// Called every frame

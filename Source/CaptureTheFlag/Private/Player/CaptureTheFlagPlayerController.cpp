@@ -7,6 +7,7 @@
 #include "InputMappingContext.h"
 #include "Blueprint/UserWidget.h"
 #include "CaptureTheFlag.h"
+#include "Core/CTFGameMode.h"
 #include "Core/CTFGameState.h"
 #include "Player/CTFPlayerState.h"
 #include "Utils/CTFBlueprintFunctionLibrary.h"
@@ -110,7 +111,20 @@ void ACaptureTheFlagPlayerController::OnRoundStateChanged(ECTFRoundState RoundSt
 	case ECTFRoundState::Reset:
 		SetIgnoreMoveInput(true);
 		SetIgnoreLookInput(true);
+		
 		//Delete Victory Cam
+		if (IsValid(VictoryCamera))
+		{
+			VictoryCamera->Destroy();
+			VictoryCamera=nullptr;
+		}
+
+		//ResetCharacter
+		if(ACTFGameMode* GameMode = UCTFBlueprintFunctionLibrary::GetCTFGameMode(this))
+		{
+			GameMode->ResetCharacter(GetCharacter());
+		}
+		
 		break;
 
 	case ECTFRoundState::Countdown:

@@ -21,12 +21,14 @@ void ACTFGameState::IncrementRound()
 
 void ACTFGameState::IncrementScore(uint8 TeamId)
 {
-	if(TeamScoreMap.Contains(TeamId))
+	if(!TeamScoreMap.Contains(TeamId))
 	{
 		return;
 	}
 
 	TeamScoreMap[TeamId]++;
+	
+	OnRoundWon.Broadcast(TeamId);
 }
 
 ECTFRoundState ACTFGameState::GetCurrentRoundState() const
@@ -47,4 +49,14 @@ void ACTFGameState::AddTeam(uint8 TeamId)
 	}
 
 	TeamScoreMap.Add(TeamId,0);
+}
+
+uint8 ACTFGameState::GetTeamScore(uint8 TeamId)
+{
+	if(!TeamScoreMap.Contains(TeamId))
+	{
+		return 0 ;
+	}
+
+	return TeamScoreMap[TeamId];
 }

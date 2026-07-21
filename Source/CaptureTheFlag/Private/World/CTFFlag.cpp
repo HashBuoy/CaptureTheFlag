@@ -5,6 +5,7 @@
 
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
+#include "Core/CTFGameState.h"
 
 // Sets default values
 ACTFFlag::ACTFFlag()
@@ -59,6 +60,28 @@ void ACTFFlag::BeginPlay()
 	Super::BeginPlay();
 
 	InitialTransform = GetActorTransform();
+
+	if (ACTFGameState* GameState = GetWorld()->GetGameState<ACTFGameState>())
+	{
+		GameState->OnRoundStateChanged.AddDynamic(this,	&ThisClass::OnRoundStateChanged);
+	}
+}
+
+void ACTFFlag::OnRoundStateChanged(ECTFRoundState RoundState)
+{
+	switch (RoundState)
+	{
+	case ECTFRoundState::Captured:
+		DropFlag();	
+		break;
+		
+
+	case ECTFRoundState::Reset:
+		Reset();
+		break;
+		
+	default:;
+	}
 }
 
 void ACTFFlag::Reset()

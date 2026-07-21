@@ -3,6 +3,7 @@
 
 #include "Core/CTFGameMode.h"
 
+#include "EngineUtils.h"
 #include "AI/CTFAgentCharacter.h"
 #include "AI/CTFAgentController.h"
 #include "AI/CTFAITeamController.h"
@@ -14,6 +15,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Player/CaptureTheFlagPlayerController.h"
 #include "Utils/CTFBlueprintFunctionLibrary.h"
+#include "World/CTFFlag.h"
 
 
 void ACTFGameMode::OnPostLogin(AController* NewPlayer)
@@ -44,14 +46,9 @@ void ACTFGameMode::FlagCaptured(uint8 TeamId)
 
 	CTFGameState->IncrementScore(TeamId);
 	CTFGameState->SetRoundState(ECTFRoundState::Captured);
-	ACTFFlag* Flag = UCTFBlueprintFunctionLibrary::GetFlag(this);
-	if(IsValid(Flag))
-	{
-		Flag->DropFlag();	
-	}
-	
+
 	FTimerHandle VictoryTimer;
-	GetWorldTimerManager().SetTimer(VictoryTimer, this,  &ACTFGameMode::ResetRound,  3.0f,  false );
+	GetWorldTimerManager().SetTimer(VictoryTimer, this,  &ACTFGameMode::ResetRound,  6.0f,  false );
 }
 
 void ACTFGameMode::ResetRound()
@@ -61,7 +58,7 @@ void ACTFGameMode::ResetRound()
 	{
 		return;
 	}
-
+	
 	CTFGameState->SetRoundState(ECTFRoundState::Reset);
 	StartCountdown();
 }

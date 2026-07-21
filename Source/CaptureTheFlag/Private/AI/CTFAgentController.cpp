@@ -3,7 +3,10 @@
 
 #include "AI/CTFAgentController.h"
 
+#include "Core/CTFGameMode.h"
+#include "Core/CTFGameState.h"
 #include "Player/CTFPlayerState.h"
+#include "Utils/CTFBlueprintFunctionLibrary.h"
 
 uint8 ACTFAgentController::GetTeamId_Implementation() const
 {
@@ -19,12 +22,45 @@ void ACTFAgentController::BeginPlay()
 {
 	UE_LOG(LogTemp,Error,TEXT("ACTFAgentController %s BeginPlay"),*this->GetActorNameOrLabel());
 	Super::BeginPlay();
+
+	if (ACTFGameState* GameState = GetWorld()->GetGameState<ACTFGameState>())
+	{
+		GameState->OnRoundStateChanged.AddDynamic(this,	&ThisClass::OnRoundStateChanged);
+	}
 }
 
 void ACTFAgentController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	UE_LOG(LogTemp,Error,TEXT("ACTFAgentController %s EndPlay"),*this->GetActorNameOrLabel());
 	Super::EndPlay(EndPlayReason);
+}
+
+void ACTFAgentController::OnRoundStateChanged(ECTFRoundState RoundState)
+{
+	switch (RoundState)
+	{
+	case ECTFRoundState::Captured:
+		//Stop brain
+		break;
+
+	case ECTFRoundState::Reset:
+		//Reset brain if valid
+		//Reset Character
+		if(ACTFGameMode* GameMode = UCTFBlueprintFunctionLibrary::GetCTFGameMode(this))
+		{
+			GameMode->ResetCharacter(GetCharacter());
+		}
+		break;
+
+	case ECTFRoundState::Countdown:
+		break;
+
+	case ECTFRoundState::Started:
+		//Start brain
+		break;
+		
+	default:;
+	}
 }
 
 void ACTFAgentController::BeginDestroy()

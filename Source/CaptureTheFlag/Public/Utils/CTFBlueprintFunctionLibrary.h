@@ -4,9 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
-#include "World/CTFFlag.h"
 #include "CTFBlueprintFunctionLibrary.generated.h"
 
+class ACTFFlag;
+class ACTFGameState;
 class ACTFGameMode;
 /**
  * 
@@ -20,8 +21,15 @@ public:
 	UFUNCTION(BlueprintPure, Category="CTF", meta=(WorldContext="WorldContextObject"))
 	static ACTFGameMode* GetCTFGameMode(const UObject* WorldContextObject);
 
+	UFUNCTION(BlueprintPure, Category="CTF", meta=(WorldContext="WorldContextObject"))
+	static ACTFGameState* GetCTFGameState(const UObject* WorldContextObject);
+
 	UFUNCTION(BlueprintPure, Category="CTF")
     static FLinearColor GetTeamColor(uint8 TeamId);
+
+	UFUNCTION(BlueprintPure, Category="CTF")
+	static FText GetTeamName(uint8 TeamId);
+
 
 	UFUNCTION(BlueprintPure, Category="CTF", meta=(WorldContext="WorldContextObject"))
 	static ACTFFlag* GetFlag(const UObject* WorldContextObject);

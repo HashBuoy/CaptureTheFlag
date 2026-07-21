@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "Data/CTFEnums.h"
 #include "Interface/CTFTeamInterface.h"
 #include "CTFAgentController.generated.h"
 
@@ -24,6 +25,10 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
+	UFUNCTION()
+	void OnRoundStateChanged(ECTFRoundState RoundState);
+	
 public:
 	virtual void BeginDestroy() override;
 	virtual void Destroyed() override;
